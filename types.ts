@@ -26,3 +26,6 @@ export interface PatientRecord {
 }
 
 export type NewPatientRecord = Omit<PatientRecord, 'RowID'>;
+
+export type SortKey = keyof PatientRecord;
+export type SortDirection = 'ascending' | 'descending';

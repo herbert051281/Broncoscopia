@@ -1,4 +1,3 @@
-
 import type { PatientRecord, NewPatientRecord } from '../types';
 
 // INSTRUCCIONES:
@@ -428,5 +427,18 @@ export const updateRecord = async (record: PatientRecord): Promise<void> => {
     //     headers: { 'Content-Type': 'application/json' }
     // });
 };
+
+export const deleteRecord = async (rowId: string): Promise<void> => {
+    console.log("Simulating delete:", rowId);
+    await simulateDelay(500);
+    mockData = mockData.filter(r => r.RowID !== rowId);
+    // ORDEN REAL:
+    // await fetch(APPS_SCRIPT_URL, {
+    //     method: 'POST',
+    //     body: JSON.stringify({ action: 'delete', data: { RowID: rowId } }),
+    //     headers: { 'Content-Type': 'application/json' }
+    // });
+};
+
 
 // --- FIN DEL CÓDIGO DE SIMULACIÓN ---

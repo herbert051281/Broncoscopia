@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import type { Chart } from 'chart.js';
 
@@ -21,6 +20,7 @@ const commonOptions = {
     maintainAspectRatio: false,
     plugins: {
         legend: {
+            position: 'bottom' as const,
             labels: {
                 color: '#d1d5db', // gray-300
                 font: {
@@ -53,7 +53,10 @@ export const DoughnutChart: React.FC<ChartProps> = ({ labels, data }) => {
                             borderColor: '#374151', // gray-700
                         }]
                     },
-                    options: commonOptions,
+                    options: {
+                        ...commonOptions,
+                        cutout: '50%',
+                    },
                 });
             }
         }
@@ -79,6 +82,32 @@ export const BarChart: React.FC<BarChartProps> = ({ labels, data, horizontal = f
             }
             const ctx = canvasRef.current.getContext('2d');
             if (ctx) {
+                 const datalabelsPlugin = {
+                    id: 'customDatalabels',
+                    afterDatasetsDraw: (chart: Chart) => {
+                        const { ctx } = chart;
+                        ctx.save();
+                        ctx.font = '600 12px sans-serif';
+                        ctx.fillStyle = '#d1d5db'; // gray-300
+
+                        chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
+                            const value = chart.data.datasets[0].data[index];
+                            if (typeof value === 'number' && value > 0) {
+                                if (horizontal) {
+                                    ctx.textAlign = 'left';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.fillText(String(value), datapoint.x + 8, datapoint.y);
+                                } else {
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'bottom';
+                                    ctx.fillText(String(value), datapoint.x, datapoint.y - 5);
+                                }
+                            }
+                        });
+                        ctx.restore();
+                    }
+                };
+                
                 chartRef.current = new (window as any).Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -86,8 +115,8 @@ export const BarChart: React.FC<BarChartProps> = ({ labels, data, horizontal = f
                         datasets: [{
                             label: 'Cantidad de Pacientes',
                             data: data,
-                            backgroundColor: chartColors[0],
-                            borderColor: chartColors[0],
+                            backgroundColor: chartColors,
+                            borderColor: chartColors,
                             borderWidth: 1
                         }]
                     },
@@ -97,21 +126,25 @@ export const BarChart: React.FC<BarChartProps> = ({ labels, data, horizontal = f
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                ticks: { color: '#9ca3af' }, // gray-400
-                                grid: { color: '#4b5563' } // gray-600
+                                ticks: { color: '#9ca3af', precision: 0 },
+                                grid: { display: false },
+                                grace: horizontal ? 0 : 1,
                             },
                             x: {
-                                ticks: { color: '#9ca3af' }, // gray-400
-                                grid: { color: '#4b5563' } // gray-600
+                                beginAtZero: true,
+                                ticks: { color: '#9ca3af', precision: 0 },
+                                grid: { display: false },
+                                grace: horizontal ? 1 : 0,
                             }
                         },
                         plugins: {
                            ...commonOptions.plugins,
                            legend: {
-                            display: false // Usually not needed for single-dataset bar charts
+                            display: false
                            }
                         }
                     },
+                    plugins: [datalabelsPlugin]
                 });
             }
         }
