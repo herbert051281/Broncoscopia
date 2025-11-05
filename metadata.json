@@ -1,0 +1,5 @@
+{
+  "name": "Broncoscopia ",
+  "description": "A web application to manage patient diagnostic records, connecting to a Google Sheet via Google Apps Script. It allows for creating, viewing, and editing patient data in a professional dark-themed interface.",
+  "requestFramePermissions": []
+}
